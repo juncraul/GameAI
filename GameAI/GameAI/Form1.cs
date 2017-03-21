@@ -17,9 +17,25 @@ namespace GameAI
             InitializeComponent();
         }
 
+        ApplicationEngine applicationEngine;
+        Timer timer;
+
         private void Form1_Load(object sender, EventArgs e)
         {
+            applicationEngine = ApplicationEngine.GetInstance(pictureBoxWorld.Size);
 
+            timer = new Timer();
+            timer.Interval = 17;
+            timer.Tick += Timer_Tick;
+            timer.Start();
+
+            
+        }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            applicationEngine.DoLogic();
+            pictureBoxWorld.Image = applicationEngine.Draw();
         }
     }
 }
