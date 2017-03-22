@@ -8,37 +8,36 @@ using System.Threading.Tasks;
 
 namespace Population
 {
-    public abstract class BaseRobot
+    public abstract class BaseRobot : BaseEntity
     {
-        public Vector2 Position;
+        protected Vector2 WhereToGo;
+        protected Random Random;
 
         private double _directionRadian;
-        private Color _color;
-        private Size _size;
-        private Vector2 _whereToGo;
         private double _moveSpeed;
 
-        public BaseRobot(Vector2 position, Color color)
+        public BaseRobot(Vector2 position, Random rand) : base(position)
         {
-            Position = position;
-            _color = color;
-            _size = new Size(20, 20);
-            _moveSpeed = 1.5f;
+            _moveSpeed = 14.5f;
+            Random = rand;
         }
 
-        public void Draw(Graphics graphics, Bitmap bitmap)
+        public override void Draw(Graphics graphics)
         {
 
-            Brush brush = new SolidBrush(_color);
-            graphics.FillEllipse(brush, (float)Position.X - _size.Width / 2, bitmap.Height - ((float)Position.Y + _size.Height / 2), _size.Width, _size.Height);
+            Brush brush = new SolidBrush(Color);
+            graphics.FillEllipse(brush, (float)Position.X - Size.Width / 2, (float)Position.Y - Size.Height / 2, Size.Width, Size.Height);
+
+            graphics.FillEllipse(brush, (float)WhereToGo.X - Size.Width / 2, (float)WhereToGo.Y - Size.Height / 2, Size.Width, Size.Height);
 
             Pen pen = new Pen(Color.Black);
             Vector2 direction = (new Vector2(15, 0).Rotate(_directionRadian));
-            graphics.DrawLine(pen, (float)Position.X, (float)(bitmap.Height - Position.Y), (float)(direction + Position).X, (float)(bitmap.Height - (direction + Position).Y));
+            graphics.DrawLine(pen, (float)Position.X, (float)(Position.Y), (float)(direction + Position).X, (float)(direction + Position).Y);
         }
 
         public void Move()
         {
+            _directionRadian = Functions.AngleBetweenTwoPoints(Position, WhereToGo);
             Position += new Vector2(1, 0).Rotate(_directionRadian).Normaize() * _moveSpeed;
         }
     }

@@ -9,6 +9,8 @@ namespace GameAI
 {
     public static class ApplicationSettings
     {
-        public static Size mapCells = new Size(30, 20);
+        public static Random Random = new Random(0);
+        public static Size MapVisibilityCells = new Size(100, 80);
+        public static Size MapItemsCells = new Size(30, 20);
     }
 }

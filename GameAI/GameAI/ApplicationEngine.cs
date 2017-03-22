@@ -17,19 +17,35 @@ namespace GameAI
         private Bitmap _bitmap;
 
         List<BaseRobot> robots;
-        bool[,] map;
+        List<BaseItem> items;
+        List<BaseBuilding> buildings;
+        bool[,] mapVisibility;
+        //short[,] mapItems;
         SizeF cellSize;
 
         private ApplicationEngine(Size worldCanvasSize)
         {
             _bitmap = new Bitmap(worldCanvasSize.Width, worldCanvasSize.Height);
             _graphics = Graphics.FromImage(_bitmap);
-            map = new bool[ApplicationSettings.mapCells.Height, ApplicationSettings.mapCells.Width];
-            cellSize = new SizeF((float)worldCanvasSize.Width / ApplicationSettings.mapCells.Width, (float)worldCanvasSize.Height / ApplicationSettings.mapCells.Height);
+            mapVisibility = new bool[ApplicationSettings.MapVisibilityCells.Height, ApplicationSettings.MapVisibilityCells.Width];
+            //mapItems = new short[ApplicationSettings.mapVisibilityCells.Height, ApplicationSettings.mapVisibilityCells.Width];
+            cellSize = new SizeF((float)worldCanvasSize.Width / ApplicationSettings.MapVisibilityCells.Width, (float)worldCanvasSize.Height / ApplicationSettings.MapVisibilityCells.Height);
             robots = new List<BaseRobot>
             {
-                new ExplorerRobot(new Vector2(20, 20), Color.Red)
+                new RobotExplorer(new Vector2(20, 20), ApplicationSettings.Random),
+                new RobotMiner(new Vector2(20, 20), ApplicationSettings.Random)
             };
+            items = new List<BaseItem>();
+
+            buildings = new List<BaseBuilding>
+            {
+                new BuildingHQ(new Vector2(20, 20))
+            };
+
+            for(int i = 0; i < 10; i ++)
+            {
+                items.Add(new ItemFixed(new Vector2(ApplicationSettings.Random.NextDouble() * worldCanvasSize.Width, ApplicationSettings.Random.NextDouble() * worldCanvasSize.Height)));
+            }
         }
 
         public static ApplicationEngine GetInstance(Size worldCanvasSize)
@@ -39,20 +55,20 @@ namespace GameAI
 
         public void DoLogic()
         {
-            for (int i = 0; i < ApplicationSettings.mapCells.Height; i++)
-            {
-                for (int j = 0; j < ApplicationSettings.mapCells.Width; j++)
-                {
-                    map[i, j] = false;
-                }
-            }
+            //for (int i = 0; i < ApplicationSettings.MapVisibilityCells.Height; i++)
+            //{
+            //    for (int j = 0; j < ApplicationSettings.MapVisibilityCells.Width; j++)
+            //    {
+            //        mapVisibility[i, j] = false;
+            //    }
+            //}
 
             foreach (BaseRobot b in robots)
             {
                 switch(b)
                 {
-                    case ExplorerRobot explorer:
-                        explorer.DoLogic(map, cellSize, _bitmap.Size);
+                    case RobotExplorer explorer:
+                        explorer.DoLogic(mapVisibility, cellSize, _bitmap.Size);
                         break;
                 }
                 b.Move();
@@ -64,20 +80,43 @@ namespace GameAI
             SolidBrush brush = new SolidBrush(Color.White);
             _graphics.FillRectangle(brush, new Rectangle(0, 0, _bitmap.Width, _bitmap.Height));
 
-            for(int i = 0; i < ApplicationSettings.mapCells.Height; i ++)
+            for (int i = 0; i < ApplicationSettings.MapVisibilityCells.Height; i++)
             {
-                for(int j = 0; j < ApplicationSettings.mapCells.Width; j ++)
+                for (int j = 0; j < ApplicationSettings.MapVisibilityCells.Width; j++)
                 {
-                    brush.Color = map[i, j] ? Color.White : Color.Black;
+                    if (!mapVisibility[i, j]) continue;
+                    brush.Color = Color.White;
+                    _graphics.FillRectangle(brush, new RectangleF(j * cellSize.Width, i * cellSize.Height, cellSize.Width, cellSize.Height));
+                }
+            }
+
+            foreach (BaseItem b in items)
+            {
+                b.Draw(_graphics);
+            }
+
+            for (int i = 0; i < ApplicationSettings.MapVisibilityCells.Height; i ++)
+            {
+                for(int j = 0; j < ApplicationSettings.MapVisibilityCells.Width; j ++)
+                {
+                    if (mapVisibility[i, j]) continue;
+                    brush.Color = Color.Black;
                     _graphics.FillRectangle(brush, new RectangleF(j * cellSize.Width, i * cellSize.Height, cellSize.Width, cellSize.Height));
                 }
             }
 
             foreach (BaseRobot b in robots)
             {
-                b.Draw(_graphics, _bitmap);
+                b.Draw(_graphics);
+            }
+
+            foreach (BaseBuilding b in buildings)
+            {
+                b.Draw(_graphics);
             }
             return _bitmap;
         }
+
+
     }
 }
