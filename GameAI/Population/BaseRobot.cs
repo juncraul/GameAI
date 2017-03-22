@@ -12,6 +12,7 @@ namespace Population
     {
         protected Vector2 WhereToGo;
         protected Random Random;
+        protected double destinationRange;
 
         private double _directionRadian;
         private double _moveSpeed;
@@ -19,6 +20,7 @@ namespace Population
         public BaseRobot(Vector2 position, Random rand) : base(position)
         {
             _moveSpeed = 14.5f;
+            destinationRange = 10;
             Random = rand;
         }
 
@@ -28,7 +30,10 @@ namespace Population
             Brush brush = new SolidBrush(Color);
             graphics.FillEllipse(brush, (float)Position.X - Size.Width / 2, (float)Position.Y - Size.Height / 2, Size.Width, Size.Height);
 
-            graphics.FillEllipse(brush, (float)WhereToGo.X - Size.Width / 2, (float)WhereToGo.Y - Size.Height / 2, Size.Width, Size.Height);
+            if(WhereToGo != null)
+            {
+                graphics.FillEllipse(brush, (float)WhereToGo.X - Size.Width / 2, (float)WhereToGo.Y - Size.Height / 2, Size.Width, Size.Height);
+            }
 
             Pen pen = new Pen(Color.Black);
             Vector2 direction = (new Vector2(15, 0).Rotate(_directionRadian));
@@ -37,6 +42,7 @@ namespace Population
 
         public void Move()
         {
+            if (WhereToGo == null) return;
             _directionRadian = Functions.AngleBetweenTwoPoints(Position, WhereToGo);
             Position += new Vector2(1, 0).Rotate(_directionRadian).Normaize() * _moveSpeed;
         }

@@ -44,7 +44,7 @@ namespace GameAI
 
             for(int i = 0; i < 10; i ++)
             {
-                items.Add(new ItemFixed(new Vector2(ApplicationSettings.Random.NextDouble() * worldCanvasSize.Width, ApplicationSettings.Random.NextDouble() * worldCanvasSize.Height)));
+                items.Add(new ItemFixed(new Vector2(ApplicationSettings.Random.NextDouble() * worldCanvasSize.Width, ApplicationSettings.Random.NextDouble() * worldCanvasSize.Height), 100));
             }
         }
 
@@ -70,9 +70,16 @@ namespace GameAI
                     case RobotExplorer explorer:
                         explorer.DoLogic(mapVisibility, cellSize, _bitmap.Size);
                         break;
+                    case RobotMiner miner:
+                        ItemMovable item = miner.DoLogic(items.Where(a => (a as ItemFixed) != null).Select(a=> a as ItemFixed).ToList());
+                        if (item != null)
+                            items.Add(item);
+                        break;
                 }
                 b.Move();
             }
+
+            items.RemoveAll(a => !a.IsAlive);
         }
 
         public Bitmap Draw()

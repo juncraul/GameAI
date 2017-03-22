@@ -11,12 +11,10 @@ namespace Population
     public class RobotExplorer : BaseRobot
     {
         double explorationRange;
-        double destinationRange;
         
         public RobotExplorer(Vector2 position, Random rand) : base(position, rand)
         {
             explorationRange = 50;
-            destinationRange = 10;
             Color = Color.Red;
             Size = new Size(20, 20);
         }

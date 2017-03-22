@@ -11,11 +11,14 @@ namespace Population
     public abstract class BaseEntity
     {
         public Vector2 Position;
+        public bool IsAlive;
+
         protected Size Size;
         protected Color Color;
 
         public BaseEntity(Vector2 position)
         {
+            IsAlive = true;
             Position = position;
         }
 
