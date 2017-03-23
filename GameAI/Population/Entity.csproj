@@ -51,6 +51,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ItemFixed.cs" />
     <Compile Include="RobotMiner.cs" />
+    <Compile Include="RobotTransporter.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Mathematics\Mathematics.csproj">

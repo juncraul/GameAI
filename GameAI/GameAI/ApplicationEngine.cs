@@ -33,7 +33,8 @@ namespace GameAI
             robots = new List<BaseRobot>
             {
                 new RobotExplorer(new Vector2(20, 20), ApplicationSettings.Random),
-                new RobotMiner(new Vector2(20, 20), ApplicationSettings.Random)
+                new RobotMiner(new Vector2(20, 20), ApplicationSettings.Random),
+                new RobotTransporter(new Vector2(20, 20), ApplicationSettings.Random),
             };
             items = new List<BaseItem>();
 
@@ -74,6 +75,9 @@ namespace GameAI
                         ItemMovable item = miner.DoLogic(items.Where(a => (a as ItemFixed) != null).Select(a=> a as ItemFixed).ToList());
                         if (item != null)
                             items.Add(item);
+                        break;
+                    case RobotTransporter transporter:
+                        transporter.DoLogic(items.Where(a => (a as ItemMovable) != null).Select(a => a as ItemMovable).ToList(), buildings[0] as BuildingHQ);
                         break;
                 }
                 b.Move();

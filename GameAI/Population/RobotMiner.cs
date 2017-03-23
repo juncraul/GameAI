@@ -10,17 +10,17 @@ namespace Population
 {
     public class RobotMiner : BaseRobot
     {
-        enum RobotMinerState{
+        private enum RobotMinerState{
             Idle,
             GoToMiningSite,
             Mine
         }
 
-        RobotMinerState _state;
-        ItemFixed _itemToMine;
-        int _amountToMinePerCycle;
-        int _cycleTickIteration;
-        int _cycleMaxTick;
+        private RobotMinerState _state;
+        private ItemFixed _itemToMine;
+        private int _amountToMinePerCycle;
+        private int _cycleTickIteration;
+        private int _cycleMaxTick;
 
         public RobotMiner(Vector2 position, Random random) : base(position, random)
         {

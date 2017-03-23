@@ -9,9 +9,12 @@ namespace Population
 {
     public class ItemMovable : BaseItem
     {
+        public bool IsAvailableToBePickedUp;
+
         public ItemMovable(Vector2 position, int value) : base(position)
         {
             Color = System.Drawing.Color.Aqua;
+            IsAvailableToBePickedUp = true;
         }
     }
 }
