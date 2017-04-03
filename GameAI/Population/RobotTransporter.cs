@@ -22,7 +22,7 @@ namespace Population
 
         public RobotTransporter(Vector2 position, Random random) : base(position, random)
         {
-            Color = Color.Violet;
+            Color = Color.LightSeaGreen;
             Size = new Size(20, 20);
             _state = RobotTransporterState.GoForResource;
         }
@@ -39,6 +39,8 @@ namespace Population
                         if (movableItems.Count > 0)
                         {
                             ItemMovable closestItem = GetClosestItem(movableItems.Where(a => a.IsAvailableToBePickedUp).ToList());
+                            if (closestItem == null)
+                                break;
                             WhereToGo = closestItem.Position;
                         }
                     }
@@ -47,6 +49,8 @@ namespace Population
                         if (Functions.DistanceBetweenTwoPoints(Position, WhereToGo) < destinationRange)
                         {
                             ItemMovable closestItem = GetClosestItem(movableItems.Where(a=>a.IsAvailableToBePickedUp).ToList());
+                            if (closestItem == null)
+                                break;
                             if(Functions.DistanceBetweenTwoPoints(Position, closestItem.Position) < destinationRange)
                             {
                                 _pickedUpItem = closestItem;
@@ -83,6 +87,8 @@ namespace Population
 
         ItemMovable GetClosestItem(List<ItemMovable> movableItems)
         {
+            if (movableItems.Count == 0)
+                return null;
             double minDistance = 100000;
             double distance;
             ItemMovable closestItem = movableItems[0];

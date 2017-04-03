@@ -35,6 +35,8 @@ namespace GameAI
                 new RobotExplorer(new Vector2(20, 20), ApplicationSettings.Random),
                 new RobotMiner(new Vector2(20, 20), ApplicationSettings.Random),
                 new RobotTransporter(new Vector2(20, 20), ApplicationSettings.Random),
+                new RobotTransporter(new Vector2(20, 20), ApplicationSettings.Random),
+                new RobotTransporter(new Vector2(20, 20), ApplicationSettings.Random),
             };
             items = new List<BaseItem>();
 
@@ -72,7 +74,7 @@ namespace GameAI
                         explorer.DoLogic(mapVisibility, cellSize, _bitmap.Size);
                         break;
                     case RobotMiner miner:
-                        ItemMovable item = miner.DoLogic(items.Where(a => (a as ItemFixed) != null).Select(a=> a as ItemFixed).ToList());
+                        ItemMovable item = miner.DoLogic(items.Where(a => (a as ItemFixed) != null && a.IsVisible).Select(a=> a as ItemFixed).ToList());
                         if (item != null)
                             items.Add(item);
                         break;
@@ -81,6 +83,11 @@ namespace GameAI
                         break;
                 }
                 b.Move();
+            }
+
+            foreach(BaseItem b in items.Where(i => !i.IsVisible && (i as ItemFixed) != null))
+            {
+                b.UpdateVisibility(mapVisibility, cellSize);
             }
 
             items.RemoveAll(a => !a.IsAlive);
@@ -100,7 +107,7 @@ namespace GameAI
                     _graphics.FillRectangle(brush, new RectangleF(j * cellSize.Width, i * cellSize.Height, cellSize.Width, cellSize.Height));
                 }
             }
-
+            
             foreach (BaseItem b in items)
             {
                 b.Draw(_graphics);

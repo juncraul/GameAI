@@ -21,5 +21,10 @@ namespace Mathematics
             double result = Math.Atan2(a.Y, a.X) - Math.Atan2(b.Y, b.X);
             return 2 * Math.PI - (result < 0 ? result + 2 * Math.PI : result);
         }
+
+        public static bool CircleCircleCollision(Vector2 center0, double radius0, Vector2 center1, double radius1)
+        {
+            return DistanceBetweenTwoPoints(center0, center1) <= radius0 + radius1;
+        }
     }
 }

@@ -15,6 +15,7 @@ namespace Population
         {
             Color = System.Drawing.Color.Aqua;
             IsAvailableToBePickedUp = true;
+            IsVisible = true;
         }
     }
 }
