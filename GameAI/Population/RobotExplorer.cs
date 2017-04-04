@@ -19,7 +19,7 @@ namespace Population
             Size = new Size(20, 20);
         }
 
-        public void DoLogic(bool[,] map, SizeF cellSize, SizeF worldSize)
+        public void DoLogic(SizeF cellSize, bool[,] map, SizeF worldSize)
         {
             if (WhereToGo == null || Functions.DistanceBetweenTwoPoints(Position, WhereToGo) < destinationRange)
             {

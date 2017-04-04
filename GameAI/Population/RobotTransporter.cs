@@ -77,9 +77,18 @@ namespace Population
         }
 
         public override void Move()
-        {
+        {//TODO:Check why this is not the one which is callled
             base.Move();
             if(_pickedUpItem != null)
+            {
+                _pickedUpItem.Position = Position + (new Vector2(1, 0).Rotate(DirectionRadian) * 20);
+            }
+        }
+
+        public override void Move(SizeF cellSize, bool[,] mapVisibility)
+        {
+            base.Move(cellSize, mapVisibility);
+            if (_pickedUpItem != null)
             {
                 _pickedUpItem.Position = Position + (new Vector2(1, 0).Rotate(DirectionRadian) * 20);
             }

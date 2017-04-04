@@ -71,18 +71,20 @@ namespace GameAI
                 switch(b)
                 {
                     case RobotExplorer explorer:
-                        explorer.DoLogic(mapVisibility, cellSize, _bitmap.Size);
+                        explorer.DoLogic(cellSize, mapVisibility, _bitmap.Size);
+                        b.Move();
                         break;
                     case RobotMiner miner:
                         ItemMovable item = miner.DoLogic(items.Where(a => (a as ItemFixed) != null && a.IsVisible).Select(a=> a as ItemFixed).ToList());
                         if (item != null)
                             items.Add(item);
+                        b.Move(cellSize, mapVisibility);
                         break;
                     case RobotTransporter transporter:
                         transporter.DoLogic(items.Where(a => (a as ItemMovable) != null).Select(a => a as ItemMovable).ToList(), buildings[0] as BuildingHQ);
+                        b.Move(cellSize, mapVisibility);
                         break;
                 }
-                b.Move();
             }
 
             foreach(BaseItem b in items.Where(i => !i.IsVisible && (i as ItemFixed) != null))
