@@ -64,51 +64,57 @@ namespace Population
             List<(int, int, double)> vertexes = new List<(int, int, double)>();
             double[,] distances = new double[mapVisibility.GetLength(0), mapVisibility.GetLength(1)];
             Point[,] previous = new Point[mapVisibility.GetLength(0), mapVisibility.GetLength(1)];
+            bool[,] visited = new bool[mapVisibility.GetLength(0), mapVisibility.GetLength(1)];
 
-            for(int i = 0; i < mapVisibility.GetLength(0); i ++)
+            for (int i = 0; i < mapVisibility.GetLength(0); i ++)
             {
                 for(int j = 0; j < mapVisibility.GetLength(1); j ++)
                 {
                     distances[i, j] = 10000;
                     previous[i, j] = new Point(-1, -1);
-                    vertexes.Add((i, j, i == startIndexI && j == startIndexJ ? 0 : 10000));
                 }
             }
 
+            vertexes.Add((startIndexI, startIndexJ, 0));
             distances[startIndexI, startIndexJ] = 0;
 
-            while(vertexes.Count > 0)
+            bool shortestPathWasFound = false;
+            while(vertexes.Count > 0 && !shortestPathWasFound)
             {
                 double minimumDistance = vertexes.Min(a => a.Item3);
                 (int indexI, int indexJ, double distance) vertex = vertexes.Find(a=>a.Item3 == minimumDistance);
                 vertexes.Remove(vertex);
+                visited[vertex.indexI, vertex.indexJ] = true;
 
-                for(int i = -1; i <= 1; i ++)
+                for (int i = -1; i <= 1; i ++)
                 {
                     for(int j = -1; j <= 1; j ++)
                     {
+                        int nextPointI = i + vertex.indexI;
+                        int nextPointJ = j + vertex.indexJ;
                         //Check if is not going in plus directions
                         //either i or j must be 0, but not both
                         if ((i != 0 && j != 0) || i == j)
                             continue;
                         //Check if is outside the map
-                        if (i + vertex.indexI < 0 || i + vertex.indexI >= mapVisibility.GetLength(0) ||
-                            j + vertex.indexJ < 0 || j + vertex.indexJ >= mapVisibility.GetLength(1))
+                        if (nextPointI < 0 || nextPointI >= mapVisibility.GetLength(0) ||
+                            nextPointJ < 0 || nextPointJ >= mapVisibility.GetLength(1))
                             continue;
                         //Check if the cell is visible
-                        if (!mapVisibility[i + vertex.indexI, j + vertex.indexJ])
+                        if (!mapVisibility[nextPointI, nextPointJ])
                             continue;
-                        if (!vertexes.Exists(v => v.Item1 == i + vertex.indexI && v.Item2 == j + vertex.indexJ))
+                        //Check if node was already visited
+                        if(visited[nextPointI, nextPointJ])
                             continue;
                         double alternativeRoute = vertex.distance + 1;
-                        if(alternativeRoute < distances[i + vertex.indexI, j + vertex.indexJ])
+                        if(alternativeRoute < distances[nextPointI, nextPointJ])
                         {
-                            distances[i + vertex.indexI, j + vertex.indexJ] = alternativeRoute;
-                            previous[i + vertex.indexI, j + vertex.indexJ] = new Point(vertex.indexI, vertex.indexJ);
-                            int foundVertexIndex = vertexes.FindIndex(a => a.Item1 == i + vertex.indexI && a.Item2 == j + vertex.indexJ);
-                            (int, int, double) foundVertex = vertexes[foundVertexIndex];
-                            vertexes[foundVertexIndex] = (foundVertex.Item1, foundVertex.Item2, alternativeRoute);
+                            distances[nextPointI, nextPointJ] = alternativeRoute;
+                            previous[nextPointI, nextPointJ] = new Point(vertex.indexI, vertex.indexJ);
+                            vertexes.Add((nextPointI, nextPointJ, alternativeRoute));
                         }
+                        if (nextPointI == endIndexI && nextPointJ == endIndexJ)
+                            shortestPathWasFound = true;
                     }
                 }
             }
@@ -116,7 +122,7 @@ namespace Population
             Point nextPoint = new Point(endIndexI, endIndexJ);
             Point currentPoint = previous[endIndexI, endIndexJ];
 
-            if (currentPoint.X == -1 && currentPoint.Y == -1)
+            if (currentPoint.X == -1 && currentPoint.Y == -1)//if(!shortestPathWasFound)
                 return startPosition;
             while(currentPoint.X != startIndexI || currentPoint.Y != startIndexJ)
             {
