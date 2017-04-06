@@ -12,6 +12,7 @@ namespace Population
     {
         private enum RobotMinerState{
             Idle,
+            SearchForMiningSite,
             GoToMiningSite,
             Mine
         }
@@ -26,7 +27,7 @@ namespace Population
         {
             Color = Color.Orchid;
             Size = new Size(20, 20);
-            _state = RobotMinerState.GoToMiningSite;
+            _state = RobotMinerState.SearchForMiningSite;
             _amountToMinePerCycle = 10;
             _cycleMaxTick = 20;
         }
@@ -37,40 +38,35 @@ namespace Population
 
             switch(_state)
             {
+                //In Idle state do nothing
                 case RobotMinerState.Idle:
                     break;
-                case RobotMinerState.GoToMiningSite:
-                    if (WhereToGo == null)
+                case RobotMinerState.SearchForMiningSite:
+                    //If there are any resources on the screen, go after the closest one
+                    if (fixedItems.Count > 0)
                     {
-                        if (fixedItems.Count > 0)
-                        {
-                            double minDistance = 100000;
-                            double distance;
-                            ItemFixed goForThisItem = fixedItems[0];
-                            foreach (ItemFixed i in fixedItems)
-                            {
-                                distance = Functions.DistanceBetweenTwoPoints(Position, i.Position);
-                                if (distance < minDistance)
-                                {
-                                    goForThisItem = i;
-                                    minDistance = distance;
-                                }
-                            }
-                            WhereToGo = goForThisItem.Position;
-                        }
+                        ItemFixed closestItem = Helper.GetClosestItem(Position, fixedItems);
+                        if (closestItem == null)
+                            break;
+                        WhereToGo = closestItem.Position;
+                        _state = RobotMinerState.GoToMiningSite;
                     }
-                    else
+                    break;
+                //Go to the mining site
+                case RobotMinerState.GoToMiningSite:
+                    //Check if robot arrived at the resource
+                    if (Functions.DistanceBetweenTwoPoints(Position, WhereToGo) < destinationRange)
                     {
-                        if(Functions.DistanceBetweenTwoPoints(Position, WhereToGo) < destinationRange)
-                        {
-                            WhereToGo = null;
-                            _state = RobotMinerState.Mine;
-                        }
+                        //Change the robot's state to Mine
+                        WhereToGo = null;
+                        _state = RobotMinerState.Mine;
                     }
                     break;
                 case RobotMinerState.Mine:
+                    //Check if it has anything to mine
                     if(_itemToMine == null)
                     {
+                        //Get the first resource within the range
                         foreach (ItemFixed i in fixedItems)
                         {
                             if (Functions.DistanceBetweenTwoPoints(Position, i.Position) < destinationRange)
@@ -79,13 +75,15 @@ namespace Population
                                 break;
                             }
                         }
+                        //If no item in range, change the state to search and go
                         if(_itemToMine == null)
                         {
-                            _state = RobotMinerState.GoToMiningSite;
+                            _state = RobotMinerState.SearchForMiningSite;
                         }
                     }
                     else
                     {
+                        //Mine the resource every _cycleMaxTick ticks
                         _cycleTickIteration++;
                         if(_cycleTickIteration == _cycleMaxTick)
                         {

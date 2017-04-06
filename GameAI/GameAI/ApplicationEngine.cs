@@ -20,22 +20,18 @@ namespace GameAI
         List<BaseItem> items;
         List<BaseBuilding> buildings;
         bool[,] mapVisibility;
-        //short[,] mapItems;
         SizeF cellSize;
-
+        
         private ApplicationEngine(Size worldCanvasSize)
         {
             _bitmap = new Bitmap(worldCanvasSize.Width, worldCanvasSize.Height);
             _graphics = Graphics.FromImage(_bitmap);
             mapVisibility = new bool[ApplicationSettings.MapVisibilityCells.Height, ApplicationSettings.MapVisibilityCells.Width];
-            //mapItems = new short[ApplicationSettings.mapVisibilityCells.Height, ApplicationSettings.mapVisibilityCells.Width];
             cellSize = new SizeF((float)worldCanvasSize.Width / ApplicationSettings.MapVisibilityCells.Width, (float)worldCanvasSize.Height / ApplicationSettings.MapVisibilityCells.Height);
             robots = new List<BaseRobot>
             {
                 new RobotExplorer(new Vector2(20, 20), ApplicationSettings.Random),
                 new RobotMiner(new Vector2(20, 20), ApplicationSettings.Random),
-                new RobotTransporter(new Vector2(20, 20), ApplicationSettings.Random),
-                new RobotTransporter(new Vector2(20, 20), ApplicationSettings.Random),
                 new RobotTransporter(new Vector2(20, 20), ApplicationSettings.Random),
             };
             items = new List<BaseItem>();
@@ -58,35 +54,34 @@ namespace GameAI
 
         public void DoLogic()
         {
-            //for (int i = 0; i < ApplicationSettings.MapVisibilityCells.Height; i++)
-            //{
-            //    for (int j = 0; j < ApplicationSettings.MapVisibilityCells.Width; j++)
-            //    {
-            //        mapVisibility[i, j] = false;
-            //    }
-            //}
-
             foreach (BaseRobot b in robots)
             {
                 switch(b)
                 {
                     case RobotExplorer explorer:
+                        //Do explorer logic, while passing the map to it
                         explorer.DoLogic(cellSize, mapVisibility, _bitmap.Size);
-                        b.Move();
+                        //Move the explorer in straight line
+                        explorer.Move();
                         break;
                     case RobotMiner miner:
+                        //Do miner logic, while passing the list of fixed items which are visible
                         ItemMovable item = miner.DoLogic(items.Where(a => (a as ItemFixed) != null && a.IsVisible).Select(a=> a as ItemFixed).ToList());
                         if (item != null)
                             items.Add(item);
-                        b.Move(cellSize, mapVisibility);
+                        //Move the miner on a grid
+                        miner.Move(cellSize, mapVisibility);
                         break;
                     case RobotTransporter transporter:
+                        //Do transporter logic, while passing the list of fixed items which are visible
                         transporter.DoLogic(items.Where(a => (a as ItemMovable) != null).Select(a => a as ItemMovable).ToList(), buildings[0] as BuildingHQ);
-                        b.Move(cellSize, mapVisibility);
+                        //Move the transporter on a grid
+                        transporter.Move(cellSize, mapVisibility);
                         break;
                 }
             }
 
+            //Update the visibility property
             foreach(BaseItem b in items.Where(i => !i.IsVisible && (i as ItemFixed) != null))
             {
                 b.UpdateVisibility(mapVisibility, cellSize);
@@ -137,6 +132,19 @@ namespace GameAI
             return _bitmap;
         }
 
+        public void AddExplorer()
+        {
+            robots.Add(new RobotExplorer(new Vector2(20, 20), ApplicationSettings.Random));
+        }
 
+        public void AddMiner()
+        {
+            robots.Add(new RobotMiner(new Vector2(20, 20), ApplicationSettings.Random));
+        }
+
+        public void AddTransporter()
+        {
+            robots.Add(new RobotTransporter(new Vector2(20, 20), ApplicationSettings.Random));
+        }
     }
 }

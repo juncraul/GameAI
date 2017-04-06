@@ -49,6 +49,7 @@
     <Compile Include="BaseItem.cs" />
     <Compile Include="BaseRobot.cs" />
     <Compile Include="BuildingHQ.cs" />
+    <Compile Include="Helper.cs" />
     <Compile Include="ItemMovable.cs" />
     <Compile Include="RobotExplorer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

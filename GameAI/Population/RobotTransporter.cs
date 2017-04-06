@@ -31,14 +31,18 @@ namespace Population
         {
             switch (_state)
             {
+                    //In Idle state do nothing
                 case RobotTransporterState.Idle:
                     break;
+                    //Find a resource nearby and go after it
                 case RobotTransporterState.GoForResource:
+                    //Check if it has a resource that it goes after
                     if (WhereToGo == null)
                     {
+                        //If there are any resources on the screen, go after the closest one
                         if (movableItems.Count > 0)
                         {
-                            ItemMovable closestItem = GetClosestItem(movableItems.Where(a => a.IsAvailableToBePickedUp).ToList());
+                            ItemMovable closestItem = Helper.GetClosestItem(Position, movableItems.Where(a => a.IsAvailableToBePickedUp).ToList());
                             if (closestItem == null)
                                 break;
                             WhereToGo = closestItem.Position;
@@ -46,25 +50,22 @@ namespace Population
                     }
                     else
                     {
+                        //Check if robot arrived at the resource
                         if (Functions.DistanceBetweenTwoPoints(Position, WhereToGo) < destinationRange)
                         {
-                            ItemMovable closestItem = GetClosestItem(movableItems.Where(a=>a.IsAvailableToBePickedUp).ToList());
+                            //If it got to the resource, pick the closest one(maybe there are more in within the rage)
+                            ItemMovable closestItem = Helper.GetClosestItem(Position, movableItems.Where(a=>a.IsAvailableToBePickedUp).ToList());
                             if (closestItem == null)
                                 break;
-                            if(Functions.DistanceBetweenTwoPoints(Position, closestItem.Position) < destinationRange)
-                            {
-                                _pickedUpItem = closestItem;
-                                closestItem.IsAvailableToBePickedUp = false;
-                                WhereToGo = hq.Position;
-                                _state = RobotTransporterState.ReturnResourceToBase;
-                            }
-                            else
-                            {
-                                WhereToGo = null;
-                            }
+                            //Change the states of the robot and the item so no other robot will pick this one up
+                            _pickedUpItem = closestItem;
+                            closestItem.IsAvailableToBePickedUp = false;
+                            WhereToGo = hq.Position;
+                            _state = RobotTransporterState.ReturnResourceToBase;
                         }
                     }
                     break;
+                    //After the resource is picked up, bring it back to the base
                 case RobotTransporterState.ReturnResourceToBase:
                     if (Functions.DistanceBetweenTwoPoints(Position, WhereToGo) < destinationRange)
                     {
@@ -77,7 +78,7 @@ namespace Population
         }
 
         public override void Move()
-        {//TODO:Check why this is not the one which is callled
+        {
             base.Move();
             if(_pickedUpItem != null)
             {
@@ -94,23 +95,6 @@ namespace Population
             }
         }
 
-        ItemMovable GetClosestItem(List<ItemMovable> movableItems)
-        {
-            if (movableItems.Count == 0)
-                return null;
-            double minDistance = 100000;
-            double distance;
-            ItemMovable closestItem = movableItems[0];
-            foreach (ItemMovable i in movableItems)
-            {
-                distance = Functions.DistanceBetweenTwoPoints(Position, i.Position);
-                if (distance < minDistance)
-                {
-                    closestItem = i;
-                    minDistance = distance;
-                }
-            }
-            return closestItem;
-        }
+        
     }
 }

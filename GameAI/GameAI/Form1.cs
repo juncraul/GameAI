@@ -37,5 +37,20 @@ namespace GameAI
             applicationEngine.DoLogic();
             pictureBoxWorld.Image = applicationEngine.Draw();
         }
+
+        private void buttonAddExplorer_Click(object sender, EventArgs e)
+        {
+            applicationEngine.AddExplorer();
+        }
+
+        private void buttonAddMiner_Click(object sender, EventArgs e)
+        {
+            applicationEngine.AddMiner();
+        }
+
+        private void buttonAddTransporter_Click(object sender, EventArgs e)
+        {
+            applicationEngine.AddTransporter();
+        }
     }
 }
