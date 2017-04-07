@@ -135,16 +135,19 @@ namespace GameAI
         public void AddExplorer()
         {
             robots.Add(new RobotExplorer(new Vector2(20, 20), ApplicationSettings.Random));
+            robots.Last().ShowPath = robots.First().ShowPath;
         }
 
         public void AddMiner()
         {
             robots.Add(new RobotMiner(new Vector2(20, 20), ApplicationSettings.Random));
+            robots.Last().ShowPath = robots.First().ShowPath;
         }
 
         public void AddTransporter()
         {
             robots.Add(new RobotTransporter(new Vector2(20, 20), ApplicationSettings.Random));
+            robots.Last().ShowPath = robots.First().ShowPath;
         }
 
         public void ShowHideRobotPath(bool show)
