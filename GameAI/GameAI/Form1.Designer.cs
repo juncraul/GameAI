@@ -32,6 +32,7 @@
             this.buttonAddExplorer = new System.Windows.Forms.Button();
             this.buttonAddMiner = new System.Windows.Forms.Button();
             this.buttonAddTransporter = new System.Windows.Forms.Button();
+            this.buttonShowPath = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxWorld)).BeginInit();
             this.SuspendLayout();
             // 
@@ -73,11 +74,22 @@
             this.buttonAddTransporter.UseVisualStyleBackColor = true;
             this.buttonAddTransporter.Click += new System.EventHandler(this.buttonAddTransporter_Click);
             // 
+            // buttonShowPath
+            // 
+            this.buttonShowPath.Location = new System.Drawing.Point(725, 100);
+            this.buttonShowPath.Name = "buttonShowPath";
+            this.buttonShowPath.Size = new System.Drawing.Size(92, 23);
+            this.buttonShowPath.TabIndex = 4;
+            this.buttonShowPath.Text = "Show Path";
+            this.buttonShowPath.UseVisualStyleBackColor = true;
+            this.buttonShowPath.Click += new System.EventHandler(this.buttonShowPath_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(851, 491);
+            this.Controls.Add(this.buttonShowPath);
             this.Controls.Add(this.buttonAddTransporter);
             this.Controls.Add(this.buttonAddMiner);
             this.Controls.Add(this.buttonAddExplorer);
@@ -96,6 +108,7 @@
         private System.Windows.Forms.Button buttonAddExplorer;
         private System.Windows.Forms.Button buttonAddMiner;
         private System.Windows.Forms.Button buttonAddTransporter;
+        private System.Windows.Forms.Button buttonShowPath;
     }
 }
 

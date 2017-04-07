@@ -16,6 +16,9 @@ namespace Population
         protected double DirectionRadian;
 
         private double _moveSpeed;
+        List<Point> path;
+
+        public bool ShowPath;
 
         public BaseRobot(Vector2 position, Random rand) : base(position)
         {
@@ -29,13 +32,15 @@ namespace Population
 
             Brush brush = new SolidBrush(Color);
             graphics.FillEllipse(brush, (float)Position.X - Size.Width / 2, (float)Position.Y - Size.Height / 2, Size.Width, Size.Height);
+            
 
-            //if(WhereToGo != null)
-            //{
-            //    graphics.FillEllipse(brush, (float)WhereToGo.X - Size.Width / 2, (float)WhereToGo.Y - Size.Height / 2, Size.Width, Size.Height);
-            //}
-
-            Pen pen = new Pen(Color.Black);
+            Pen pen = new Pen(Color);
+            if (path != null && path.Count > 1 && ShowPath)
+            {
+                pen.Color = Color;
+                graphics.DrawLines(pen, path.ToArray());
+            }
+            pen.Color = Color.Black;
             Vector2 direction = (new Vector2(15, 0).Rotate(DirectionRadian));
             graphics.DrawLine(pen, (float)Position.X, (float)(Position.Y), (float)(direction + Position).X, (float)(direction + Position).Y);
         }
@@ -118,17 +123,22 @@ namespace Population
                     }
                 }
             }
-            
+
+            path = new List<Point>();
             Point nextPoint = new Point(endIndexI, endIndexJ);
             Point currentPoint = previous[endIndexI, endIndexJ];
-
-            if (currentPoint.X == -1 && currentPoint.Y == -1)//if(!shortestPathWasFound)
+            //Check if the algorithm found a viable path to the destination
+            if (currentPoint.X == -1 && currentPoint.Y == -1)
                 return startPosition;
+            //Backtrack to the beginning of the path
             while(currentPoint.X != startIndexI || currentPoint.Y != startIndexJ)
             {
+                path.Add(new Point((int)(currentPoint.Y * cellSize.Width + cellSize.Width / 2), (int)(currentPoint.X * cellSize.Height + cellSize.Height / 2)));
                 nextPoint = currentPoint;
                 currentPoint = previous[currentPoint.X, currentPoint.Y];
             }
+            //the next destination of the path was found and is stored in nextPoint
+            //Get the position as a vector
             Vector2 retVec = GetPositionInMap(nextPoint, cellSize);
             return retVec;
         }

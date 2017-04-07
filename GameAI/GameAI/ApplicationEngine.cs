@@ -43,7 +43,7 @@ namespace GameAI
 
             for(int i = 0; i < 10; i ++)
             {
-                items.Add(new ItemFixed(new Vector2(ApplicationSettings.Random.NextDouble() * worldCanvasSize.Width, ApplicationSettings.Random.NextDouble() * worldCanvasSize.Height), 100));
+                items.Add(new ItemFixed(new Vector2(ApplicationSettings.Random.NextDouble() * (worldCanvasSize.Width - 100) + 50, ApplicationSettings.Random.NextDouble() * (worldCanvasSize.Height - 100) + 50), 100));
             }
         }
 
@@ -145,6 +145,14 @@ namespace GameAI
         public void AddTransporter()
         {
             robots.Add(new RobotTransporter(new Vector2(20, 20), ApplicationSettings.Random));
+        }
+
+        public void ShowHideRobotPath(bool show)
+        {
+            foreach(BaseRobot r in robots)
+            {
+                r.ShowPath = show;
+            }
         }
     }
 }

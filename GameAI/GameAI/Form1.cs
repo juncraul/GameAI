@@ -52,5 +52,12 @@ namespace GameAI
         {
             applicationEngine.AddTransporter();
         }
+
+        private void buttonShowPath_Click(object sender, EventArgs e)
+        {
+            bool show = buttonShowPath.Text == "Show Path";
+            applicationEngine.ShowHideRobotPath(show);
+            buttonShowPath.Text = show ? "Hide Path" : "Show Path";
+        }
     }
 }

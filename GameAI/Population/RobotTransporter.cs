@@ -13,6 +13,7 @@ namespace Population
         private enum RobotTransporterState
         {
             Idle,
+            SearchForResource,
             GoForResource,
             ReturnResourceToBase
         }
@@ -24,7 +25,7 @@ namespace Population
         {
             Color = Color.LightSeaGreen;
             Size = new Size(20, 20);
-            _state = RobotTransporterState.GoForResource;
+            _state = RobotTransporterState.SearchForResource;
         }
 
         public void DoLogic(List<ItemMovable> movableItems, BuildingHQ hq)
@@ -34,35 +35,36 @@ namespace Population
                     //In Idle state do nothing
                 case RobotTransporterState.Idle:
                     break;
-                    //Find a resource nearby and go after it
-                case RobotTransporterState.GoForResource:
-                    //Check if it has a resource that it goes after
-                    if (WhereToGo == null)
+                    //Find a resource nearby
+                case RobotTransporterState.SearchForResource:
+                    //If there are any resources on the screen, go after the closest one
+                    if (movableItems.Count > 0)
                     {
-                        //If there are any resources on the screen, go after the closest one
-                        if (movableItems.Count > 0)
-                        {
-                            ItemMovable closestItem = Helper.GetClosestItem(Position, movableItems.Where(a => a.IsAvailableToBePickedUp).ToList());
-                            if (closestItem == null)
-                                break;
-                            WhereToGo = closestItem.Position;
-                        }
+                        ItemMovable closestItem = Helper.GetClosestItem(Position, movableItems.Where(a => a.IsAvailableToBePickedUp).ToList());
+                        if (closestItem == null)
+                            break;
+                        WhereToGo = closestItem.Position;
+                        _state = RobotTransporterState.GoForResource;
+                    }
+                    break;
+                //Find a resource nearby
+                case RobotTransporterState.GoForResource:
+                    //Check if robot arrived at the resource
+                    if (Functions.DistanceBetweenTwoPoints(Position, WhereToGo) < destinationRange)
+                    {
+                        //If it got to the resource, pick the closest one(maybe there are more in within the rage)
+                        ItemMovable closestItem = Helper.GetClosestItem(Position, movableItems.Where(a=>a.IsAvailableToBePickedUp).ToList());
+                        if (closestItem == null)
+                            break;
+                        //Change the states of the robot and the item so no other robot will pick this one up
+                        _pickedUpItem = closestItem;
+                        closestItem.IsAvailableToBePickedUp = false;
+                        WhereToGo = hq.Position;
+                        _state = RobotTransporterState.ReturnResourceToBase;
                     }
                     else
                     {
-                        //Check if robot arrived at the resource
-                        if (Functions.DistanceBetweenTwoPoints(Position, WhereToGo) < destinationRange)
-                        {
-                            //If it got to the resource, pick the closest one(maybe there are more in within the rage)
-                            ItemMovable closestItem = Helper.GetClosestItem(Position, movableItems.Where(a=>a.IsAvailableToBePickedUp).ToList());
-                            if (closestItem == null)
-                                break;
-                            //Change the states of the robot and the item so no other robot will pick this one up
-                            _pickedUpItem = closestItem;
-                            closestItem.IsAvailableToBePickedUp = false;
-                            WhereToGo = hq.Position;
-                            _state = RobotTransporterState.ReturnResourceToBase;
-                        }
+                        _state = RobotTransporterState.SearchForResource;
                     }
                     break;
                     //After the resource is picked up, bring it back to the base
@@ -70,7 +72,7 @@ namespace Population
                     if (Functions.DistanceBetweenTwoPoints(Position, WhereToGo) < destinationRange)
                     {
                         _pickedUpItem = null;
-                        _state = RobotTransporterState.GoForResource;
+                        _state = RobotTransporterState.SearchForResource;
                         WhereToGo = null;
                     }
                     break;
